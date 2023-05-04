@@ -1,6 +1,11 @@
 import sys
 from math import floor
 
+###########################
+### ARITHMETIC DECODING ###
+###########################
+
+# apply arithmetic decoding algorithm to the given text
 def arithmetic_decode_bin(code, k, src, l):
     suma = sum([x[1] for x in src])
     init_probs = [(x[0],x[1]/suma) for x in src]
@@ -46,9 +51,13 @@ def arithmetic_decode_bin(code, k, src, l):
                 used += 1
     return x
 
+#############################
+### DECOMPRESSION PROCESS ###
+#############################
+
 def descompressor(txt):
     # decode the txt
-    k = 23
+    k = 128
     src = [(' ', 1867), ('!', 1), ("'", 4), (',', 212), ('-', 5), ('.', 37), (':', 6), (';', 21), ('?', 1), ('A', 10), ('B', 4), ('C', 8), ('D', 6), ('E', 7), ('F', 4), ('G', 6), ('H', 2), ('I', 2), ('L', 6), ('M', 8), ('N', 2), ('O', 1), ('P', 6), ('Q', 9), ('R', 5), ('S', 3), ('T', 6), ('U', 1), ('Y', 6), ('\\', 10), ('a', 1017), ('b', 175), ('c', 302), ('d', 427), ('e', 1067), ('f', 46), ('g', 80), ('h', 92), ('i', 358), ('j', 34), ('l', 498), ('m', 230), ('n', 560), ('o', 734), ('p', 149), ('q', 132), ('r', 508), ('s', 571), ('t', 267), ('u', 391), ('v', 68), ('x', 2), ('y', 122), ('z', 34), ('¡', 1), ('¿', 1), ('á', 31), ('é', 29), ('í', 95), ('ñ', 18), ('ó', 62), ('ú', 7), ('ü', 1)]
     l = 10375 # size of original text
     decoded_txt = arithmetic_decode_bin(txt,k,src,l)

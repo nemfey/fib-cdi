@@ -2,7 +2,11 @@ import sys
 from math import floor
 from collections import defaultdict
 
-# calculate source from the given txt
+###########################
+### ARITHMETIC ENCODING ###
+###########################
+
+# calculate the source from the given text
 def source_fromtext(txt, n=1):
     freq_packs = {}
     for i in range(len(txt) - n + 1):
@@ -59,9 +63,13 @@ def arithmetic_encode_bin(txt,k):
         s = ""
     return c + '1'
 
+###########################
+### COMPRESSION PROCESS ###
+###########################
+
 def compressor(txt):
     # encode the txt
-    k = 23
+    k = 64
     coded_txt = arithmetic_encode_bin(txt,k)
 
     # write the code into file
