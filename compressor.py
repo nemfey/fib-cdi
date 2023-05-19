@@ -1,4 +1,5 @@
 import sys
+import time
 from collections import Counter
 from operator import itemgetter
 
@@ -277,11 +278,12 @@ def compressor(txt):
 ############
 
 def main():
+    # Start execution time
+    start_time = time.time()
+
     # Read input file
     filename = sys.argv[1]
-    f = open(filename,'r',encoding='utf-8')
-    txt = f.readline()
-    f.close()
+    txt = open(filename,'r',encoding='utf-8').read()
 
     # Encode text and write it to file
     coded_txt = compressor(txt)
@@ -290,7 +292,11 @@ def main():
     unicode_chars = len(txt)
     coded_bytes = len(coded_txt)
     performance = (coded_bytes / unicode_chars) * 8
-    print('performance:',performance)
+    print('Performance (bits/symbol):', performance)
+
+    # Execution time
+    end_time = time.time()
+    print('Execution time (in seconds):', end_time - start_time)
 
 if __name__ == "__main__":
     main()

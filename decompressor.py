@@ -1,4 +1,5 @@
 import sys
+import time
 from collections import Counter
 from operator import itemgetter
 
@@ -217,15 +218,19 @@ def decompressor(input_txt):
 ############
 
 def main():
-    
+    # Start execution time
+    start_time = time.time()
+
     # Read input file
     filename = sys.argv[1]
-    f = open(filename,'r',encoding='utf-8')
-    input_txt = f.readline()
-    f.close()
+    input_txt = open(filename,'r',encoding='utf-8').read()
 
     # Decode text and write it to file
     decompressor(input_txt)
+
+    # Execution time
+    end_time = time.time()
+    print('Execution time (in seconds):', end_time - start_time)
 
 if __name__ == "__main__":
     main()
