@@ -200,9 +200,9 @@ def encode(txta,corr):
 ### SAVE FILE PROCESS ###
 #########################
 
-def write_coded_text_to_file(alp, src, max_digits, index, coded_txt):
+def write_coded_text_to_file(alp, src, max_digits, index, coded_txt, filename):
 
-    f = open('coded_txt.txt','wb')
+    f = open(filename+'.cdi','wb')
 
     # Encode and write alp
     # CODE HERE
@@ -241,7 +241,7 @@ def write_coded_text_to_file(alp, src, max_digits, index, coded_txt):
 ### COMPRESSION PROCESS ###
 ###########################
 
-def compressor(txt):
+def compressor(filename, txt):
 
     # Alphabet of text
     alp = sorted(list(set(txt)))
@@ -269,7 +269,7 @@ def compressor(txt):
     coded_txt = int(huf_code, 2).to_bytes((len(huf_code) + 7) // 8, byteorder='big')
 
     # Write paramteres and coded text to file
-    write_coded_text_to_file(alp, src, max_digits, index, coded_txt)
+    write_coded_text_to_file(alp, src, max_digits, index, coded_txt, filename)
 
     return coded_txt
 
@@ -283,10 +283,10 @@ def main():
 
     # Read input file
     filename = sys.argv[1]
-    txt = open(filename,'r',encoding='utf-8').read()
+    txt = open(filename+'.txt','r',encoding='utf-8').read()
 
     # Encode text and write it to file
-    coded_txt = compressor(txt)
+    coded_txt = compressor(filename, txt)
 
     # Calculate encoding performance
     unicode_chars = len(txt)

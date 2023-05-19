@@ -161,8 +161,8 @@ def decode(txtb,corr):
 ### SAVE FILE PROCESS ###
 #########################
 
-def write_decoded_text_to_file(decoded_txt):
-    f = open('decoded_txt.txt','w')
+def write_decoded_text_to_file(decoded_txt, filename):
+    f = open(filename+'-desc.txt','w')
     f.write(decoded_txt)
     f.close()
 
@@ -187,7 +187,7 @@ def split_txt(txt):
 ### DECOMPRESSION PROCESS ###
 #############################
 
-def decompressor(input_txt):
+def decompressor(input_txt, filename):
 
     # Read encoded text and parameters
     alp, src, max_digits, index, coded_txt = split_txt(input_txt)
@@ -210,7 +210,7 @@ def decompressor(input_txt):
     decoded_txt = decode_burrows_wheeler(mtf_decoded,index)
 
     # Write decoded text to output file
-    write_decoded_text_to_file(decoded_txt)
+    write_decoded_text_to_file(decoded_txt, filename)
 
 
 ############
@@ -223,10 +223,10 @@ def main():
 
     # Read input file
     filename = sys.argv[1]
-    input_txt = open(filename,'r',encoding='utf-8').read()
+    input_txt = open(filename+'.cdi','r',encoding='utf-8').read()
 
     # Decode text and write it to file
-    decompressor(input_txt)
+    decompressor(input_txt, filename)
 
     # Execution time
     end_time = time.time()
