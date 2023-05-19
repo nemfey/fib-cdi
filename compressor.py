@@ -199,42 +199,40 @@ def encode(txta,corr):
 #########################
 ### SAVE FILE PROCESS ###
 #########################
+def convertir_a_string(lista):
+    cadena = ""
+    for tupla in lista:
+        elemento = "{} {}".format(tupla[0], tupla[1])
+        cadena += elemento + " "
+    return cadena.strip()  # Elimina cualquier espacio en blanco al final de la cadena
 
-def write_coded_text_to_file(alp, src, max_digits, index, coded_txt, filename):
 
-    f = open(filename+'.cdi','wb')
+def write_coded_text_to_file(alp, src, index, coded_txt):
+
+    f = open('coded_txt_test.txt','wb')
 
     # Encode and write alp
-    # CODE HERE
+    # CODE HERE    
+    caracteres_bytes = ''.join(alp).encode()
+    f.write(caracteres_bytes)
+    f.write(b'\n')
 
     # Encode and write src
-    # CODE HERE
+    cadena = convertir_a_string(src)
+    f.write(cadena.encode())
+    f.write(b'\n')
 
     # Encode and write max digits
     # CODE HERE
 
     # Encode and write index
-    # CODE HERE
+    index = index.to_bytes((index.bit_length() + 7) // 8, byteorder='big')
+    f.write(index)
+    f.write(b'\n')
     
     # Write coded text
     f.write(coded_txt)
     f.close()
-    #Hacer tantos writes como parámetros necesitemos que se guarden
-    #linea1 = "Linea1"
-    #linea1 = linea1 + '\n'
-    #linea2 = "Linea2"
-    #linea2 = linea2 + '\n'
-    #f.write(linea1)
-    #f.write(linea2)
-    #Importante añandir '\n' al final de cada uno pq si no, no se guarda en cada línea. Todo tiene que ser en string
-    #return coded_txt #Retorna el código para después calcular el rendimiento
-
-    '''Segunda opción, con esta no se añade explicitamente el '\n'
-    #Hace cosas
-    with open('coded_txt.txt','w') as f:
-        print("Linea 1", file=f)
-        print("Linea 2", file=f)
-    '''
 
 
 ###########################
@@ -269,7 +267,7 @@ def compressor(filename, txt):
     coded_txt = int(huf_code, 2).to_bytes((len(huf_code) + 7) // 8, byteorder='big')
 
     # Write paramteres and coded text to file
-    write_coded_text_to_file(alp, src, max_digits, index, coded_txt, filename)
+    write_coded_text_to_file(alp, src, index, coded_txt)
 
     return coded_txt
 

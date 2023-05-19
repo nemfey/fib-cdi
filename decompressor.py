@@ -179,8 +179,40 @@ def split_txt(txt):
     coded_txt = ""
 
     # CODE HERE
+    alp = txt.readline().decode()
+    if (alp == "\n"):
+        alp = txt.readline().decode()
+    alp = sorted(list(set(alp)))
 
+    src = txt.readline().decode()
+    src = convertir_cadena_a_lista(src)
+
+    max_digits = calcular_max_digitos(src)
+
+
+    line = txt.readline()
+    line = line.rstrip(b'\n')
+    index = int.from_bytes(line, byteorder='big')
+
+    coded_txt = txt.readlines()
     return alp, src, max_digits, index, coded_txt
+
+def convertir_cadena_a_lista(cadena):
+    lista = []
+    elementos = cadena.split()
+    for i in range(0, len(elementos), 2):
+        tupla = (elementos[i], int(elementos[i+1]))
+        lista.append(tupla)
+    return lista
+
+def calcular_max_digitos(lista_tuplas):
+    max_digitos = 0
+    for tupla in lista_tuplas:
+        valor = tupla[0]
+        num_digitos = len(valor)
+        if num_digitos > max_digitos:
+            max_digitos = num_digitos
+    return max_digitos
 
 
 #############################
@@ -223,7 +255,7 @@ def main():
 
     # Read input file
     filename = sys.argv[1]
-    input_txt = open(filename+'.cdi','r',encoding='utf-8').read()
+    input_txt = open(filename+'.cdi','rb')
 
     # Decode text and write it to file
     decompressor(input_txt, filename)
