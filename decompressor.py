@@ -179,20 +179,23 @@ def split_txt(txt):
     coded_txt = ""
 
     # CODE HERE
-    alp = txt.readline().decode()
+    alp = txt.readline().decode('utf-8')
     if (alp == "\n"):
-        alp = txt.readline().decode()
+        alp = txt.readline().decode('utf-8')
     alp = sorted(list(set(alp)))
+    print(alp)
 
-    src = txt.readline().decode()
+    src = txt.readline().decode('utf-8')
     src = convertir_cadena_a_lista(src)
+    print(src)
 
     max_digits = calcular_max_digitos(src)
 
 
-    line = txt.readline()
+    line = txt.readline() # Devuelve una lista de lineas, que son las que corresponden al coded_txt
     line = line.rstrip(b'\n')
     index = int.from_bytes(line, byteorder='big')
+    print(index)
 
     coded_txt = txt.readlines()
     return alp, src, max_digits, index, coded_txt
@@ -222,10 +225,14 @@ def calcular_max_digitos(lista_tuplas):
 def decompressor(input_txt, filename):
 
     # Read encoded text and parameters
-    alp, src, max_digits, index, coded_txt = split_txt(input_txt)
+    alp, src, max_digits, index, lines_coded_txt = split_txt(input_txt)
 
     # Convert from bytes to string
-    # CODE HERE
+    '''print(type(lines_coded_txt))
+    #Convertir cada linea de byte a string para después juntarlas
+    lineas_str = [linea.decode('utf-8') for linea in lines_coded_txt] 
+    coded_txt = "\n".join(lineas_str)
+    print(type(coded_txt))'''
 
     # Huffman
     huf = huffman_code(coded_txt,src,2)
@@ -255,7 +262,7 @@ def main():
 
     # Read input file
     filename = sys.argv[1]
-    input_txt = open(filename+'.cdi','rb')
+    input_txt = open(filename + '.cdi','rb')
 
     # Decode text and write it to file
     decompressor(input_txt, filename)

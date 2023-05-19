@@ -207,19 +207,19 @@ def convertir_a_string(lista):
     return cadena.strip()  # Elimina cualquier espacio en blanco al final de la cadena
 
 
-def write_coded_text_to_file(alp, src, index, coded_txt):
+def write_coded_text_to_file(alp, src, index, coded_txt, filename):
 
-    f = open('coded_txt_test.txt','wb')
+    f = open(filename+'.cdi','wb')
 
     # Encode and write alp
     # CODE HERE    
-    caracteres_bytes = ''.join(alp).encode()
+    caracteres_bytes = ''.join(alp).encode('utf-8')
     f.write(caracteres_bytes)
     f.write(b'\n')
 
     # Encode and write src
     cadena = convertir_a_string(src)
-    f.write(cadena.encode())
+    f.write(cadena.encode('utf-8'))
     f.write(b'\n')
 
     # Encode and write max digits
@@ -267,7 +267,7 @@ def compressor(filename, txt):
     coded_txt = int(huf_code, 2).to_bytes((len(huf_code) + 7) // 8, byteorder='big')
 
     # Write paramteres and coded text to file
-    write_coded_text_to_file(alp, src, index, coded_txt)
+    write_coded_text_to_file(alp, src, index, coded_txt, filename)
 
     return coded_txt
 
