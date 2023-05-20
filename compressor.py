@@ -199,6 +199,7 @@ def encode(txta,corr):
 #########################
 ### SAVE FILE PROCESS ###
 #########################
+
 def convertir_a_string(lista):
     cadena = ""
     for tupla in lista:
@@ -206,33 +207,37 @@ def convertir_a_string(lista):
         cadena += elemento + " "
     return cadena.strip()  # Elimina cualquier espacio en blanco al final de la cadena
 
-
 def write_coded_text_to_file(alp, src, index, coded_txt, filename):
 
     f = open(filename+'.cdi','wb')
 
-    # Encode and write alp
-    # CODE HERE    
-    caracteres_bytes = ''.join(alp).encode('utf-8')
-    f.write(caracteres_bytes)
+    # Encode and write alp  
+    alp_string = ''.join(alp)
+    f.write(alp_string.encode('utf-8'))
     f.write(b'\n')
+
+    #print(alp)
+    #print(src)
+    #print(index)
+    #print(coded_txt)
 
     # Encode and write src
-    cadena = convertir_a_string(src)
-    f.write(cadena.encode('utf-8'))
+    src_string = ''.join([ str(x)+" "+str(y)+" " for (x,y) in src])
+    f.write(src_string.encode('utf-8'))
     f.write(b'\n')
-
-    # Encode and write max digits
-    # CODE HERE
 
     # Encode and write index
     index = index.to_bytes((index.bit_length() + 7) // 8, byteorder='big')
     f.write(index)
     f.write(b'\n')
-    
-    # Write coded text
+
+    # Encode and write coded text
+    coded_txt = int(coded_txt, 2).to_bytes((len(coded_txt) + 7) // 8, byteorder='big')
     f.write(coded_txt)
+
     f.close()
+
+    return coded_txt
 
 
 ###########################
@@ -264,10 +269,9 @@ def compressor(filename, txt):
 
     # Encoding
     huf_code = encode(mtf_code,corr)
-    coded_txt = int(huf_code, 2).to_bytes((len(huf_code) + 7) // 8, byteorder='big')
 
     # Write paramteres and coded text to file
-    write_coded_text_to_file(alp, src, index, coded_txt, filename)
+    coded_txt = write_coded_text_to_file(alp, src, index, huf_code, filename)
 
     return coded_txt
 

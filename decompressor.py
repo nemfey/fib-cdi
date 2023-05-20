@@ -2,6 +2,7 @@ import sys
 import time
 from collections import Counter
 from operator import itemgetter
+import binascii
 
 #######################
 ### BURROWS-WHEELER ###
@@ -171,51 +172,56 @@ def write_decoded_text_to_file(decoded_txt, filename):
 ### GET PARAMETERS AND ENCODED TEXT ###
 #######################################
 
-def split_txt(txt):
+def recover_src_from_string(src_string):
+    src = []
+    src_list = src_string.split()
+    for i in range(0, len(src_list), 2):
+        tuple = (src_list[i], int(src_list[i+1]))
+        src.append(tuple)
+    return src
+
+def split_txt(input_txt):
     alp = ""
     src = ""
     max_digits = ""
     index = ""
     coded_txt = ""
 
-    # CODE HERE
-    alp = txt.readline().decode('utf-8')
-    if (alp == "\n"):
-        alp = txt.readline().decode('utf-8')
-    alp = sorted(list(set(alp)))
-    print(alp)
+    # Recover alp
+    alp_string = input_txt.readline().decode('utf-8')
+    if alp_string == '\n':
+        alp_string = alp_string + input_txt.readline().decode('utf-8')
+    
+    if alp_string.endswith('\n'):
+        alp_string = alp_string[:-1]
+    alp = sorted(list(set(alp_string)))
 
-    src = txt.readline().decode('utf-8')
-    src = convertir_cadena_a_lista(src)
-    print(src)
+    # Recover src
+    src_string = input_txt.readline().decode('utf-8')
+    if src_string.endswith('\n'):
+        src_string = src_string[:-1]
+    src = recover_src_from_string(src_string)
 
-    max_digits = calcular_max_digitos(src)
+    # Recover max_digits
+    #max_digits = calcular_max_digitos(src)
 
+    # Recover index
+    index_line = input_txt.readline()
+    index_line = index_line.rstrip(b'\n')
+    index = int.from_bytes(index_line, byteorder='big')
 
-    line = txt.readline() # Devuelve una lista de lineas, que son las que corresponden al coded_txt
-    line = line.rstrip(b'\n')
-    index = int.from_bytes(line, byteorder='big')
-    print(index)
+    # Recover coded text
+    coded_txt_string = input_txt.readlines()[0]
 
-    coded_txt = txt.readlines()
-    return alp, src, max_digits, index, coded_txt
+    coded_txt = ''.join(format(byte, '08b') for byte in coded_txt_string)
+    coded_txt = coded_txt.lstrip('0')
 
-def convertir_cadena_a_lista(cadena):
-    lista = []
-    elementos = cadena.split()
-    for i in range(0, len(elementos), 2):
-        tupla = (elementos[i], int(elementos[i+1]))
-        lista.append(tupla)
-    return lista
-
-def calcular_max_digitos(lista_tuplas):
-    max_digitos = 0
-    for tupla in lista_tuplas:
-        valor = tupla[0]
-        num_digitos = len(valor)
-        if num_digitos > max_digitos:
-            max_digitos = num_digitos
-    return max_digitos
+    #print(alp)
+    #print(src)
+    #print(index)
+    #print(coded_txt)
+    
+    return alp, src, index, coded_txt
 
 
 #############################
@@ -223,23 +229,18 @@ def calcular_max_digitos(lista_tuplas):
 #############################
 
 def decompressor(input_txt, filename):
-
+    
     # Read encoded text and parameters
-    alp, src, max_digits, index, lines_coded_txt = split_txt(input_txt)
-
-    # Convert from bytes to string
-    '''print(type(lines_coded_txt))
-    #Convertir cada linea de byte a string para después juntarlas
-    lineas_str = [linea.decode('utf-8') for linea in lines_coded_txt] 
-    coded_txt = "\n".join(lineas_str)
-    print(type(coded_txt))'''
-
+    alp, src, index, coded_txt = split_txt(input_txt)
+    
     # Huffman
     huf = huffman_code(coded_txt,src,2)
     corr = dict(huf)
 
     # Decode
+    max_digits = len(next(iter(corr)))
     huf_decoded = decode(coded_txt,corr)
+
     huf_decoded = [int((huf_decoded[i:i+max_digits])) for i in range(0, len(huf_decoded), max_digits)]
 
     # Move-to-Front
