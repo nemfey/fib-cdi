@@ -215,11 +215,11 @@ def split_txt(input_txt):
 
     coded_txt = ''.join(format(byte, '08b') for byte in coded_txt_string)
     coded_txt = coded_txt.lstrip('0')
-
-    #print(alp)
-    #print(src)
-    #print(index)
-    #print(coded_txt)
+    
+    print(alp)
+    print(src)
+    print(index)
+    print(coded_txt)
     
     return alp, src, index, coded_txt
 
@@ -232,14 +232,23 @@ def decompressor(input_txt, filename):
     
     # Read encoded text and parameters
     alp, src, index, coded_txt = split_txt(input_txt)
-    
+
     # Huffman
     huf = huffman_code(coded_txt,src,2)
     corr = dict(huf)
 
     # Decode
-    max_digits = len(next(iter(corr)))
+    src_values = [int(val[1]) for val in src]
+    max_digits = len(str(max(src_values)))
+    #max_digits = len(next(iter(corr)))
     huf_decoded = decode(coded_txt,corr)
+
+    #print(max_digits)
+
+    #print(huf)
+    #print(corr)
+    #print('+',max_digits)
+    #print(huf_decoded)
 
     huf_decoded = [int((huf_decoded[i:i+max_digits])) for i in range(0, len(huf_decoded), max_digits)]
 
