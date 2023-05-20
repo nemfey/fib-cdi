@@ -210,16 +210,21 @@ def split_txt(input_txt):
     index_line = index_line.rstrip(b'\n')
     index = int.from_bytes(index_line, byteorder='big')
 
+    # Recover number of bits
+    n_bits = input_txt.readline()
+    n_bits = n_bits.rstrip(b'\n')
+    n_bits = int.from_bytes(n_bits, byteorder='big')
+
     # Recover coded text
     coded_txt_string = input_txt.readlines()[0]
 
     coded_txt = ''.join(format(byte, '08b') for byte in coded_txt_string)
-    coded_txt = coded_txt.lstrip('0')
+    coded_txt = coded_txt[-n_bits:]
     
     print(alp)
     print(src)
     print(index)
-    print(coded_txt)
+    print(len(coded_txt), coded_txt)
     
     return alp, src, index, coded_txt
 
