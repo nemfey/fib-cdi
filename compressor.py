@@ -216,10 +216,10 @@ def write_coded_text_to_file(alp, src, index, coded_txt, filename):
     f.write(alp_string.encode('utf-8'))
     f.write(b'\n')
 
-    print(alp)
-    print(src)
-    print(index)
-    print(len(coded_txt), coded_txt)
+    #print(alp)
+    #print(src)
+    #print(index)
+    #print(len(coded_txt), coded_txt)
 
     # Encode and write src
     src_string = ''.join([ str(x)+" "+str(y)+" " for (x,y) in src])
@@ -241,7 +241,7 @@ def write_coded_text_to_file(alp, src, index, coded_txt, filename):
     coded_txt = int(coded_txt, 2).to_bytes((len(coded_txt) + 7) // 8, byteorder='big')
     f.write(coded_txt)
 
-    print(coded_txt)
+    #print(coded_txt)
 
     f.close()
 

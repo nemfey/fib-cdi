@@ -221,10 +221,10 @@ def split_txt(input_txt):
     coded_txt = ''.join(format(byte, '08b') for byte in coded_txt_string)
     coded_txt = coded_txt[-n_bits:]
     
-    print(alp)
-    print(src)
-    print(index)
-    print(len(coded_txt), coded_txt)
+    #print(alp)
+    #print(src)
+    #print(index)
+    #print(len(coded_txt), coded_txt)
     
     return alp, src, index, coded_txt
 
