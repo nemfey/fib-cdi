@@ -207,8 +207,7 @@ def convertir_a_string(lista):
         cadena += elemento + " "
     return cadena.strip()  # Elimina cualquier espacio en blanco al final de la cadena
 
-def write_coded_text_to_file(alp, src, index, coded_txt, filename):
-
+def write_coded_text_to_file(alp, src, max_digits, index, coded_txt, filename):
     f = open(filename+'.cdi','wb')
 
     # Encode and write alp  
@@ -216,14 +215,14 @@ def write_coded_text_to_file(alp, src, index, coded_txt, filename):
     f.write(alp_string.encode('utf-8'))
     f.write(b'\n')
 
-    #print(alp)
-    #print(src)
-    #print(index)
-    #print(len(coded_txt), coded_txt)
-
     # Encode and write src
     src_string = ''.join([ str(x)+" "+str(y)+" " for (x,y) in src])
     f.write(src_string.encode('utf-8'))
+    f.write(b'\n')
+
+    # Encode and write max_digits
+    max_digits = max_digits.to_bytes((max_digits.bit_length() + 7) // 8, byteorder='big')
+    f.write(max_digits)
     f.write(b'\n')
 
     # Encode and write index
@@ -240,8 +239,6 @@ def write_coded_text_to_file(alp, src, index, coded_txt, filename):
     # Encode and write coded text
     coded_txt = int(coded_txt, 2).to_bytes((len(coded_txt) + 7) // 8, byteorder='big')
     f.write(coded_txt)
-
-    #print(coded_txt)
 
     f.close()
 
@@ -279,7 +276,7 @@ def compressor(filename, txt):
     huf_code = encode(mtf_code,corr)
 
     # Write paramteres and coded text to file
-    coded_txt = write_coded_text_to_file(alp, src, index, huf_code, filename)
+    coded_txt = write_coded_text_to_file(alp, src, max_digits, index, huf_code, filename)
 
     return coded_txt
 

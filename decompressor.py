@@ -163,7 +163,7 @@ def decode(txtb,corr):
 #########################
 
 def write_decoded_text_to_file(decoded_txt, filename):
-    f = open(filename+'-desc.txt','w')
+    f = open(filename+'-desc.txt','w', encoding='utf-8')
     f.write(decoded_txt)
     f.close()
 
@@ -203,7 +203,9 @@ def split_txt(input_txt):
     src = recover_src_from_string(src_string)
 
     # Recover max_digits
-    #max_digits = calcular_max_digitos(src)
+    max_digits_line = input_txt.readline()
+    max_digits_line = max_digits_line.rstrip(b'\n')
+    max_digits = int.from_bytes(max_digits_line, byteorder='big')
 
     # Recover index
     index_line = input_txt.readline()
@@ -216,17 +218,13 @@ def split_txt(input_txt):
     n_bits = int.from_bytes(n_bits, byteorder='big')
 
     # Recover coded text
-    coded_txt_string = input_txt.readlines()[0]
+    coded_txt_string = input_txt.readlines()
+    coded_txt_string = b''.join(coded_txt_string)
 
     coded_txt = ''.join(format(byte, '08b') for byte in coded_txt_string)
     coded_txt = coded_txt[-n_bits:]
     
-    #print(alp)
-    #print(src)
-    #print(index)
-    #print(len(coded_txt), coded_txt)
-    
-    return alp, src, index, coded_txt
+    return alp, src, max_digits, index, coded_txt
 
 
 #############################
@@ -236,7 +234,7 @@ def split_txt(input_txt):
 def decompressor(input_txt, filename):
     
     # Read encoded text and parameters
-    alp, src, index, coded_txt = split_txt(input_txt)
+    alp, src, max_digits, index, coded_txt = split_txt(input_txt)
 
     # Huffman
     huf = huffman_code(coded_txt,src,2)
@@ -244,16 +242,8 @@ def decompressor(input_txt, filename):
 
     # Decode
     src_values = [int(val[1]) for val in src]
-    max_digits = len(str(max(src_values)))
-    #max_digits = len(next(iter(corr)))
+    #max_digits = len(str(max(src_values)))
     huf_decoded = decode(coded_txt,corr)
-
-    #print(max_digits)
-
-    #print(huf)
-    #print(corr)
-    #print('+',max_digits)
-    #print(huf_decoded)
 
     huf_decoded = [int((huf_decoded[i:i+max_digits])) for i in range(0, len(huf_decoded), max_digits)]
 

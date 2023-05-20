@@ -5,7 +5,7 @@ import sys
 ############
 
 def main(file1, file2):
-   with open(file1, 'r') as f1, open(file2, 'r') as f2:
+   with open(file1, 'r', encoding='utf-8') as f1, open(file2, 'r', encoding='utf-8') as f2:
         content1 = f1.read()
         content2 = f2.read()
 
