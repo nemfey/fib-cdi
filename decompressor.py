@@ -99,7 +99,8 @@ def canonical_code(L,q=2, alf = [0,1]):
     bl_count[0] = 0
     next_code = {}
     maximum = max(L) + 1       
-    for l in range (1, maximum):
+    #for l in range (1, maximum):
+    for l in range (0, maximum):
         code = (code + bl_count[l-1])*q
         next_code[l] = code 
     def_code = []
