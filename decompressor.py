@@ -114,8 +114,6 @@ def canonical_code(L,q=2, alf = [0,1]):
 
 def huffman_code(txt, src, package_size=1):
     d_nodes = {}
-    print("SRC:" , src)
-    print("TXT:", txt)
     for c in src:
         d_nodes[c[0]] = 0
     
@@ -145,7 +143,6 @@ def huffman_code(txt, src, package_size=1):
                 i += package_size
             d_nodes[package] += 1
         
-        print(len(sorted_d))
         sorted_d[1] = (new_c,new_f)
         sorted_d.pop(0)
         sorted_d = sorted(sorted_d, key=lambda x: x[1])

@@ -7,11 +7,20 @@ from operator import itemgetter
 ### BURROWS-WHEELER ###
 #######################
 
-def compare_idx(x, y, txt):
-    if txt[x] != txt[y]:
+def compare_idx_rec(x, y, txt, n):
+    if txt[x] != txt[y] or n == len(txt):
         return txt[x] < txt[y]
     
-    return compare_idx((x+1)%len(txt), (y+1)%len(txt), txt)
+    return compare_idx_rec((x+1)%len(txt), (y+1)%len(txt), txt, n+1)
+
+def compare_idx(x, y, txt):
+    return compare_idx_rec(x, y, txt, 0)
+
+#def compare_idx(x, y, txt):
+#    if txt[x] != txt[y]:
+#        return txt[x] < txt[y]
+#    
+#    return compare_idx((x+1)%len(txt), (y+1)%len(txt), txt)
 
 def merge_sort(arr, txt):
     if len(arr) <= 1:
@@ -155,8 +164,6 @@ def canonical_code(L,q=2, alf = [0,1]):
 
 def huffman_code(txt, src, package_size=1):
     d_nodes = {}
-    print("SRC:" , src)
-    print("TXT:", txt)
     for c in src:
         d_nodes[c[0]] = 0
     
@@ -186,7 +193,6 @@ def huffman_code(txt, src, package_size=1):
                 i += package_size
             d_nodes[package] += 1
         
-        print(len(sorted_d))
         sorted_d[1] = (new_c,new_f)
         sorted_d.pop(0)
         sorted_d = sorted(sorted_d, key=lambda x: x[1])
