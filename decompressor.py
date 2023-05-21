@@ -50,9 +50,13 @@ def source_fromtext(txt, n=1):
             freq_packs[packs] += 1
         else:
             freq_packs[packs] = 1
+    if (len(txt)%n != 0):
+        ini = len(txt)-len(txt)%n
+        freq_packs[txt[ini:len(txt)]] = 1
+    
     freq_list = [(k, v) for k, v in freq_packs.items()]
     return sorted(freq_list, key=lambda x: x[0])
-
+    
 def kraft_inequality(lengths, q):
     s = 0
     for l in lengths:
@@ -110,6 +114,8 @@ def canonical_code(L,q=2, alf = [0,1]):
 
 def huffman_code(txt, src, package_size=1):
     d_nodes = {}
+    print("SRC:" , src)
+    print("TXT:", txt)
     for c in src:
         d_nodes[c[0]] = 0
     
@@ -119,22 +125,34 @@ def huffman_code(txt, src, package_size=1):
         new_c = sorted_d[0][0] + sorted_d[1][0]
         new_f = sorted_d[0][1] + sorted_d[1][1]
         
-        for i in range(0, len(sorted_d[0][0]), package_size):
+        i = 0
+        while i < len(sorted_d[0][0]):
             package = sorted_d[0][0][i:i+package_size]
-            d_nodes[package] += 1
-            
-        for i in range(0, len(sorted_d[1][0]), package_size):
-            package = sorted_d[1][0][i:i+package_size]
+            if (package not in d_nodes.keys()):
+                package = sorted_d[0][0][i:i+len(sorted_d[0][0])%package_size]
+                i += len(sorted_d[0][0])%package_size
+            else:
+                i += package_size
             d_nodes[package] += 1
         
+        i = 0
+        while i < len(sorted_d[1][0]):
+            package = sorted_d[1][0][i:i+package_size]
+            if (package not in d_nodes.keys()):
+                package = sorted_d[1][0][i:i+len(sorted_d[1][0])%package_size]
+                i += len(sorted_d[1][0])%package_size
+            else:
+                i += package_size
+            d_nodes[package] += 1
+        
+        print(len(sorted_d))
         sorted_d[1] = (new_c,new_f)
-        sorted_d.pop(0);
+        sorted_d.pop(0)
         sorted_d = sorted(sorted_d, key=lambda x: x[1])
     
     result = [(key,value) for key, value in zip(d_nodes.keys(), canonical_code(d_nodes.values(), 2, ['0','1']))]
     return result
-
-
+    
 ##############
 ### DECODE ###
 ##############
