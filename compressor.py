@@ -63,7 +63,7 @@ def sorted_permutations(txt):
     perms = merge_sort(perms, txt)
     return perms
 
-def encode_burrows_wheeler_merge(txt):
+def encode_burrows_wheeler(txt):
     sorted_perms = sorted_permutations(txt)
     last_col = ''.join(txt[x-1] for x in sorted_perms)
     pos = sorted_perms.index(0)
@@ -149,7 +149,6 @@ def canonical_code(L,q=2, alf = [0,1]):
     bl_count[0] = 0
     next_code = {}
     maximum = max(L) + 1       
-    #for l in range (1, maximum):
     for l in range (0, maximum):
         code = (code + bl_count[l-1])*q
         next_code[l] = code 
@@ -282,7 +281,7 @@ def compressor(filename, txt):
     alp = sorted(list(set(txt)))
 
     # Burrows-Wheeler transform
-    bw = encode_burrows_wheeler_merge(txt)
+    bw = encode_burrows_wheeler(txt)
     bw_code = bw[0]
     index = bw[1]
 
