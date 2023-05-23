@@ -237,29 +237,31 @@ def write_coded_text_to_file(alp, src, max_digits, index, coded_txt, filename):
 
     # Encode and write alp  
     alp_string = ''.join(alp)
-    f.write(alp_string.encode('utf-8'))
-    f.write(b'\n')
+    alp_string = alp_string.encode('utf-8') + b'\n'
+    f.write(alp_string)
+    #f.write(b'\n')
 
     # Encode and write src
     src_string = ''.join([ str(x)+" "+str(y)+" " for (x,y) in src])
-    f.write(src_string.encode('utf-8'))
-    f.write(b'\n')
+    src_string = src_string.encode('utf-8') + b'\n'
+    f.write(src_string)
+    #f.write(b'\n')
 
     # Encode and write max_digits
-    max_digits = max_digits.to_bytes((max_digits.bit_length() + 7) // 8, byteorder='big')
+    max_digits = max_digits.to_bytes((max_digits.bit_length() + 7) // 8, byteorder='big') + b'\n'
     f.write(max_digits)
-    f.write(b'\n')
+    #f.write(b'\n')
 
     # Encode and write index
-    index = index.to_bytes((index.bit_length() + 7) // 8, byteorder='big')
+    index = index.to_bytes((index.bit_length() + 7) // 8, byteorder='big') + b'\n'
     f.write(index)
-    f.write(b'\n')
+    #f.write(b'\n')
 
     # Encode and write bits to recover
     n_bits = len(coded_txt)
-    recover_bits = n_bits.to_bytes((n_bits.bit_length() + 7) // 8, byteorder='big')
+    recover_bits = n_bits.to_bytes((n_bits.bit_length() + 7) // 8, byteorder='big') + b'\n'
     f.write(recover_bits)
-    f.write(b'\n')
+    #f.write(b'\n')
 
     # Encode and write coded text
     coded_txt = int(coded_txt, 2).to_bytes((len(coded_txt) + 7) // 8, byteorder='big')
@@ -267,7 +269,7 @@ def write_coded_text_to_file(alp, src, max_digits, index, coded_txt, filename):
 
     f.close()
 
-    return coded_txt
+    return alp_string + src_string + max_digits + index + recover_bits + coded_txt
 
 
 ###########################
