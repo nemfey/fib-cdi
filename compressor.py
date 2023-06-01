@@ -275,11 +275,9 @@ def write_coded_text_to_file(alp, src, index, coded_txt, filename):
 
     data = {'a': alp_string, 's': src, 'i': index, 'b': recover_bits, 'c': coded_txt}
 
-    print('compress')
     with open(filename+'.cdi', 'wb') as f:
         pickle.dump(data, f)
     f.close()
-    print('compress')
 
 ###########################
 ### COMPRESSION PROCESS ###
@@ -330,7 +328,6 @@ def main():
     # Calculate encoding performance
     unicode_chars = len(txt)
     coded_bytes = os.path.getsize(filename+'.cdi')
-    print(coded_bytes)
     performance = (coded_bytes / unicode_chars) * 8
     print('Performance (bits/symbol):', performance)
 
