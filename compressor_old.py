@@ -1,9 +1,7 @@
 import sys
-import os
 import time
 from collections import Counter
 from operator import itemgetter
-import pickle
 
 #######################
 ### BURROWS-WHEELER ###
@@ -83,40 +81,6 @@ def encode_move_to_front(txt):
         alphabet.insert(0, char)
     return sequence
 
-
-###########################
-### RUN-LENGTH ENCODING ###
-###########################
-
-def rle_encoding(txt):
-    c = 0
-    lre_code = ''
-    
-    if (txt[0] == 0):
-        c = 1
-    else:
-        lre_code += chr(txt[0])
-    
-    for i in range(1,len(txt)):
-        if (txt[i] == 0):
-            c += 1
-        elif (c > 1):
-            lre_code += (chr(1000) + chr(c) + chr(txt[i]))
-            c = 0
-        elif (c == 1):
-            lre_code += (chr(0) + chr(txt[i]))
-            c = 0
-        else:
-            lre_code += chr(txt[i])
-            c = 0
-            
-    if (c > 1):
-        lre_code += (chr(1000) + chr(c))
-        c = 0
-    elif (c == 1):
-        lre_code += (chr(0))
-    
-    return ''.join(lre_code)
 
 ###############
 ### HUFFMAN ###
@@ -254,32 +218,52 @@ def encode(txta,corr):
 ### SAVE FILE PROCESS ###
 #########################
 
-def write_coded_text_to_file(alp, src, index, coded_txt, filename):
-    # Encode and write alp
+def convertir_a_string(lista):
+    cadena = ""
+    for tupla in lista:
+        elemento = "{} {}".format(tupla[0], tupla[1])
+        cadena += elemento + " "
+    return cadena.strip()  # Elimina cualquier espacio en blanco al final de la cadena
+
+def write_coded_text_to_file(alp, src, max_digits, index, coded_txt, filename):
+    f = open(filename+'.cdi','wb')
+
+    # Encode and write alp  
     alp_string = ''.join(alp)
-    alp_string = alp_string.encode('utf-8')
+    alp_string = alp_string.encode('utf-8') + b'\n'
+    f.write(alp_string)
+    #f.write(b'\n')
 
     # Encode and write src
-    #src_string = ''.join([ str(x)+" "+str(y)+" " for (x,y) in src])
-    #src_string = src_string.encode('utf-8')
+    src_string = ''.join([ str(x)+" "+str(y)+" " for (x,y) in src])
+    src_string = src_string.encode('utf-8') + b'\n'
+    f.write(src_string)
+    #f.write(b'\n')
+
+    # Encode and write max_digits
+    max_digits = max_digits.to_bytes((max_digits.bit_length() + 7) // 8, byteorder='big') + b'\n'
+    f.write(max_digits)
+    #f.write(b'\n')
 
     # Encode and write index
-    index = index.to_bytes((index.bit_length() + 7) // 8, byteorder='big')
+    index = index.to_bytes((index.bit_length() + 7) // 8, byteorder='big') + b'\n'
+    f.write(index)
+    #f.write(b'\n')
 
     # Encode and write bits to recover
     n_bits = len(coded_txt)
-    recover_bits = n_bits.to_bytes((n_bits.bit_length() + 7) // 8, byteorder='big')
+    recover_bits = n_bits.to_bytes((n_bits.bit_length() + 7) // 8, byteorder='big') + b'\n'
+    f.write(recover_bits)
+    #f.write(b'\n')
 
     # Encode and write coded text
     coded_txt = int(coded_txt, 2).to_bytes((len(coded_txt) + 7) // 8, byteorder='big')
+    f.write(coded_txt)
 
-    data = {'a': alp_string, 's': src, 'i': index, 'b': recover_bits, 'c': coded_txt}
-
-    print('compress')
-    with open(filename+'.cdi', 'wb') as f:
-        pickle.dump(data, f)
     f.close()
-    print('compress')
+
+    return alp_string + src_string + max_digits + index + recover_bits + coded_txt
+
 
 ###########################
 ### COMPRESSION PROCESS ###
@@ -290,7 +274,7 @@ def compressor(filename, txt):
     # Alphabet of text
     alp = sorted(list(set(txt)))
 
-    # Burrows-Wheeler Transform
+    # Burrows-Wheeler transform
     bw = encode_burrows_wheeler(txt)
     bw_code = bw[0]
     index = bw[1]
@@ -298,19 +282,31 @@ def compressor(filename, txt):
     # Move-to-Front
     mtf_code = encode_move_to_front(bw_code)
 
-    # Run-Length Encoding
-    rle_code = rle_encoding(mtf_code)
+    max_digits = len(str(max(mtf_code)))
+
+    mtf_code = [str(x).zfill(max_digits) for x in mtf_code]
+    mtf_code = ''.join(mtf_code)
+
+    fmtf = open('movetofront.txt','w')
+    fmtf.write(mtf_code)
 
     # Huffman
-    src = source_fromtext(rle_code,1)
-    huf = huffman_code(rle_code, src, 1)
+    src = source_fromtext(mtf_code,2)
+    huf = huffman_code(mtf_code, src, 2)
+    #src = source_fromtext(mtf_code, 3)  
+    #huf = huffman_code(mtf_code, src, 3)
     corr = dict(huf)
 
     # Encoding
-    huf_code = encode(rle_code,corr)
+    huf_code = encode(mtf_code,corr)
+
+    fhuf = open('huf.txt','w')
+    fhuf.write(huf_code)
 
     # Write paramteres and coded text to file
-    write_coded_text_to_file(alp, src, index, huf_code, filename)
+    coded_txt = write_coded_text_to_file(alp, src, max_digits, index, huf_code, filename)
+
+    return coded_txt
 
 ############
 ### MAIN ###
@@ -325,12 +321,11 @@ def main():
     txt = open(filename+'.txt','r',encoding='utf-8').read()
 
     # Encode text and write it to file
-    compressor(filename, txt)
-    
+    coded_txt = compressor(filename, txt)
+
     # Calculate encoding performance
     unicode_chars = len(txt)
-    coded_bytes = os.path.getsize(filename+'.cdi')
-    print(coded_bytes)
+    coded_bytes = len(coded_txt)
     performance = (coded_bytes / unicode_chars) * 8
     print('Performance (bits/symbol):', performance)
 

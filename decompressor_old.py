@@ -3,7 +3,6 @@ import time
 from collections import Counter
 from operator import itemgetter
 import binascii
-import pickle
 
 #######################
 ### BURROWS-WHEELER ###
@@ -38,25 +37,6 @@ def decode_move_to_front(cod, alp):
         alphabet.insert(0, char)
     return txt
 
-
-###########################
-### RUN-LENGTH ENCODING ###
-###########################
-
-def rle_decoding(txt):
-    rle_decoded = []
-    i = 0
-    while i < len(txt):
-        x = ord(txt[i])
-        if (x == 1000):
-            n_zeros = ord(txt[i+1])
-            rle_decoded += [0 for _ in range(n_zeros)]
-            i += 1
-        else:
-            rle_decoded.append(x)
-        i += 1
-    
-    return rle_decoded
 
 ###############
 ### HUFFMAN ###
@@ -208,32 +188,59 @@ def write_decoded_text_to_file(decoded_txt, filename):
 ### GET PARAMETERS AND ENCODED TEXT ###
 #######################################
 
-def split_txt(filename):
+def recover_src_from_string(src_string):
+    src = []
+    src_list = src_string.split()
+    for i in range(0, len(src_list), 2):
+        tuple = (src_list[i], int(src_list[i+1]))
+        src.append(tuple)
+    return src
+
+def split_txt(input_txt):
     alp = ""
     src = ""
+    max_digits = ""
     index = ""
     coded_txt = ""
 
-    with open(filename + '.cdi','rb') as file:
-        data = pickle.load(file)
+    # Recover alp
+    alp_string = input_txt.readline().decode('utf-8')
+    if alp_string == '\n':
+        alp_string = alp_string + input_txt.readline().decode('utf-8')
+    
+    if alp_string.endswith('\n'):
+        alp_string = alp_string[:-1]
+    alp = sorted(list(set(alp_string)))
 
-        alp_string = data['a'].decode('utf-8')
-        alp = sorted(list(set(alp_string)))
+    # Recover src
+    src_string = input_txt.readline().decode('utf-8')
+    if src_string.endswith('\n'):
+        src_string = src_string[:-1]
+    src = recover_src_from_string(src_string)
 
-        src = data['s']
+    # Recover max_digits
+    max_digits_line = input_txt.readline()
+    max_digits_line = max_digits_line.rstrip(b'\n')
+    max_digits = int.from_bytes(max_digits_line, byteorder='big')
 
-        index_line = data['i']
-        index = int.from_bytes(index_line, byteorder='big')
+    # Recover index
+    index_line = input_txt.readline()
+    index_line = index_line.rstrip(b'\n')
+    index = int.from_bytes(index_line, byteorder='big')
 
-        n_bits_line = data['b']
-        n_bits = int.from_bytes(n_bits_line, byteorder='big')
+    # Recover number of bits
+    n_bits = input_txt.readline()
+    n_bits = n_bits.rstrip(b'\n')
+    n_bits = int.from_bytes(n_bits, byteorder='big')
 
-        coded_txt_string = data['c']
-        coded_txt = ''.join(format(byte, '08b') for byte in coded_txt_string)
-        coded_txt = coded_txt[-n_bits:]
+    # Recover coded text
+    coded_txt_string = input_txt.readlines()
+    coded_txt_string = b''.join(coded_txt_string)
 
-    return alp, src, index, coded_txt
-
+    coded_txt = ''.join(format(byte, '08b') for byte in coded_txt_string)
+    coded_txt = coded_txt[-n_bits:]
+    
+    return alp, src, max_digits, index, coded_txt
 
 
 #############################
@@ -243,23 +250,23 @@ def split_txt(filename):
 def decompressor(input_txt, filename):
     
     # Read encoded text and parameters
-    alp, src, index, coded_txt = split_txt(filename)
+    alp, src, max_digits, index, coded_txt = split_txt(input_txt)
 
     # Huffman
-    huf = huffman_code(coded_txt,src,1)
+    huf = huffman_code(coded_txt,src,2)
     corr = dict(huf)
 
     # Decode
     src_values = [int(val[1]) for val in src]
+    #max_digits = len(str(max(src_values)))
     huf_decoded = decode(coded_txt,corr)
 
-    # Run-Length Encoding
-    rle_decoded = rle_decoding(huf_decoded)
+    huf_decoded = [int((huf_decoded[i:i+max_digits])) for i in range(0, len(huf_decoded), max_digits)]
 
     # Move-to-Front
-    mtf_decoded = decode_move_to_front(rle_decoded,alp)
+    mtf_decoded = decode_move_to_front(huf_decoded,alp)
 
-    # Burrows-Wheeler Transform
+    # Burrows-Wheeler
     decoded_txt = decode_burrows_wheeler(mtf_decoded,index)
 
     # Write decoded text to output file
