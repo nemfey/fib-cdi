@@ -1,5 +1,5 @@
 ## fib-cdi
-Proyecto de la asignatura de Compresión de Datos e Imágenes (fib-upc)
+Proyecto y cuestionarios de la asignatura de Compresión de Datos e Imágenes (fib-upc)
 
 ## Nota
 10
